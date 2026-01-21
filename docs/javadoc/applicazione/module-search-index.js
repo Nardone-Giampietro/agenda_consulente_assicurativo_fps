@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"xyz.nardone.agenda_fps.applicazione"}];updateSearchResults();
