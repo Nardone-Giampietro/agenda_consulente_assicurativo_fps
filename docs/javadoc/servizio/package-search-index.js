@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"xyz.nardone.agenda_fps.servizio"},{"l":"xyz.nardone.agenda_fps.servizio.controllers"},{"l":"xyz.nardone.agenda_fps.servizio.entities"},{"l":"xyz.nardone.agenda_fps.servizio.repositories"}];updateSearchResults();
