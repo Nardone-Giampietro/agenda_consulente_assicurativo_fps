@@ -4,6 +4,7 @@
 
 ## Documentazione
 Javadoc: https://nardone-giampietro.github.io/agenda_consulente_assicurativo_fps/
+
 ---
 
 ## Dashboard (Board)
