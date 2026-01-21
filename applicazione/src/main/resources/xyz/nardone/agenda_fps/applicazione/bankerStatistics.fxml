@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.PieChart?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.BankerStatisticsController"
+            stylesheets="@stiles.css" prefHeight="900">
+
+    <!-- Side Navigation -->
+    <left>
+        <fx:include source="navigator.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20.0" prefWidth="800.0">
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <children>
+                <!-- Header Section -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label fx:id="name" text="Family Banker" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label fx:id="dates" text="Statistiche" style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
+                    </children>
+                    <Region maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <children>
+                        <Button styleClass="action-button" text="Indietro" onAction="#switchToBankerSelection" ></Button>
+                        <Button styleClass="action-button" text="Dashboard" onAction="#switchToDashboard" ></Button>
+                    </children>
+                </HBox>
+
+                <!-- Pie Chart (Directly Inside HBox, No Extra Container) -->
+                <PieChart fx:id="pieChart" styleClass="piechart"
+                          prefWidth="450" prefHeight="450"
+                          maxWidth="Infinity" maxHeight="Infinity"/>
+
+                <!-- Table Section (GridPane) -->
+                <VBox alignment="CENTER" spacing="20.0" styleClass="grid-container" VBox.vgrow="ALWAYS">
+                    <Label text="Statistiche" styleClass="grid-title"/>
+
+                    <GridPane fx:id="statisticsTable" hgap="20" vgap="10" alignment="CENTER" styleClass="grid-table" VBox.vgrow="ALWAYS">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="200" halignment="RIGHT"/>
+                            <ColumnConstraints minWidth="200" halignment="LEFT"/>
+                        </columnConstraints>
+
+                        <!-- Row 1 -->
+                        <Label fx:id="nome" text="Nome:" styleClass="grid-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="labelNome" styleClass="grid-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <!-- Row 2 -->
+                        <Label fx:id="cognome" text="Cognome:" styleClass="grid-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="labelCognome" styleClass="grid-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <!-- Row 3 -->
+                        <Label text="Appuntamenti:" styleClass="grid-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label fx:id="labelAppuntamenti" styleClass="grid-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <!-- Row 4 -->
+                        <Label text="Sottoscrizioni:" styleClass="grid-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="labelSottoscrizioni" styleClass="grid-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <!-- Row 5 -->
+                        <Label text="Primi Appuntamenti:" styleClass="grid-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <Label fx:id="labelPrimiAppuntamenti" styleClass="grid-value" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                        <!-- Row 6 -->
+                        <Label text="Premi Totali (€):" styleClass="grid-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <Label fx:id="labelPremi" styleClass="grid-value" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                    </GridPane>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

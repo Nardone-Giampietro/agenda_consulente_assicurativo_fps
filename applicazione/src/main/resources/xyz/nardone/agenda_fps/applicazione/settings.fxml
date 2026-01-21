@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.chart.PieChart?>
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.SettingsController" stylesheets="@stiles.css">
+    <!-- Side Navigation -->
+    <left>
+        <fx:include source="navigator.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20.0" alignment="CENTER" prefWidth="1000.0">
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <children>
+
+                <!-- Header Section (Dashboard Title) -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Impostazioni" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    </children>
+                </HBox>
+
+
+                <!-- Action Buttons -->
+                <VBox spacing="20.0" alignment="CENTER" maxWidth="800"> <!-- Matches Grid Width -->
+                    <children>
+
+                        <!-- Buttons Section -->
+                        <VBox spacing="10.0" styleClass="piechart-container" alignment="CENTER">
+                            <HBox spacing="10">
+                                <Button text="Gestisci Esiti" onAction="#switchToEsiti" styleClass="action-button" prefWidth="180.0" prefHeight="40.0"/>
+                                <Button text="Gestisci Polizze" onAction="#switchToPolizze" styleClass="action-button" prefWidth="180.0" prefHeight="40.0"/>
+                                <Button text="Cancella TUTTI gli App." onAction="#deleteAllAppointments" styleClass="action-button-yellow" prefWidth="180.0" prefHeight="40.0"/>
+                                <Button text="Cancella TUTTI i Clienti" onAction="#deleteAllClients" styleClass="action-button-red" prefWidth="180.0" prefHeight="40.0"/>
+                            </HBox>
+                        </VBox>
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
+    </center>
+
+</BorderPane>

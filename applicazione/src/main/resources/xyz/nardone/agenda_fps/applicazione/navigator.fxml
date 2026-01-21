@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" prefWidth="160.0" spacing="15.0" style="-fx-background-color: #34495e;" fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.NavigatorController" >
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Agenda FPS" />
+        <Button fx:id="appointmentsListButton" onAction="#switchToAppointmentsList" prefWidth="160.0" styleClass="sidebar-button" text="Appuntamenti" />
+        <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <Button fx:id="callbacksListButton" text="Callbacks" styleClass="sidebar-button" prefWidth="120.0" onAction="#switchToCallbacksList"/>
+            <Label fx:id="callbackCountLabel" text="0" styleClass="callback-notification" />
+        </HBox>
+        <Button fx:id="clientsListButton" onAction="#switchToClients" prefWidth="160.0" styleClass="sidebar-button" text="Clienti" />
+        <Button fx:id="bankersListButton" onAction="#switchToBankers" prefWidth="160.0" styleClass="sidebar-button" text="Family Banker" />
+        <Button fx:id="dashboardButton" onAction="#switchToDashboard" prefWidth="160.0" styleClass="sidebar-button" text="Dashboard" />
+        <Button fx:id="settingsButton" text="Impostazioni" onAction="#switchToSettings" styleClass="sidebar-button" prefWidth="160.0"/>
+    </children>
+</VBox>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.EsitiListController"
+            stylesheets="@stiles.css" prefHeight="1000">
+
+    <!-- Side Navigation -->
+    <left>
+        <fx:include source="navigator.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20.0" prefWidth="550.0" >
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <children>
+                <!-- Header Section -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Esiti" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label text="Lista" style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
+                    </children>
+                </HBox>
+
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS" alignment="TOP_LEFT">
+                    <!-- TableView and Dashboard Button Section -->
+                    <VBox spacing="10.0" alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <children>
+                            <!-- TableView -->
+                            <TableView fx:id="esitiTable" layoutX="20.0" layoutY="20.0" prefHeight="460.0" styleClass="table-view" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                                <contextMenu>
+                                    <ContextMenu fx:id="contextMenu" styleClass="context-menu">
+                                        <items>
+                                            <MenuItem fx:id="menuItem" mnemonicParsing="false" onAction="#remove" text="Rimuovi" styleClass="menu-item"/>
+                                            <MenuItem fx:id="menuItem1" mnemonicParsing="false" onAction="#switchToUpdate" text="Modifica" styleClass="menu-item"/>
+                                        </items>
+                                    </ContextMenu>
+                                </contextMenu>
+                            </TableView>
+                            <!-- Centered Dashboard Button -->
+                            <Text fx:id="infoText" textAlignment="CENTER"/>
+                            <HBox spacing="10" alignment="CENTER">
+                                <Button fx:id="dashboardButton" mnemonicParsing="false" onAction="#switchToDashboard" text="Dashboard" styleClass="action-button"/>
+                                <Button fx:id="indietroButton" mnemonicParsing="false" onAction="#switchToSettings" text="Indietro" styleClass="action-button"/>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                    <!-- Aggiungi polizza Button on the Right (Top-Centered, No Extra Space) -->
+                    <VBox alignment="TOP_CENTER" HBox.hgrow="NEVER">
+                        <children>
+                            <Button fx:id="addEsitoButton" onAction="#switchToAddEsito" mnemonicParsing="false" text="Aggiungi Esito" styleClass="action-button"/>
+                        </children>
+                    </VBox>
+                </HBox>
+
+
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

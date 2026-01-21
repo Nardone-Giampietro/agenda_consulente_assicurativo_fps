@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.UpdateCallbackController"
+            stylesheets="@stiles.css" prefHeight="580">
+   <!-- Side Navigation -->
+   <left>
+      <fx:include source="navigator.fxml"/>
+   </left>
+
+   <!-- Main Content -->
+   <center>
+      <VBox spacing="20.0" prefWidth="600.0" alignment="CENTER">
+         <padding>
+            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+         </padding>
+         <children>
+            <!-- Header Section -->
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <children>
+                  <Label text="Callback" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                  <Label text="Modifica" style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
+               </children>
+            </HBox>
+
+            <!-- Form layout -->
+            <VBox alignment="CENTER" spacing="15.0" styleClass="filter-container" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0"
+                  AnchorPane.topAnchor="70.0">
+               <children>
+                  <!-- Family Banker selection -->
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <Label text="Family Banker:" styleClass="filter-label" minWidth="180"/>
+                     <ComboBox fx:id="bankerComboBox" prefWidth="250.0" styleClass="filter-input"/>
+                  </HBox>
+
+                  <!-- Client selection -->
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <Label text="Cliente:" styleClass="filter-label" minWidth="180"/>
+                     <ComboBox fx:id="clientComboBox" prefWidth="250.0" styleClass="filter-input"/>
+                  </HBox>
+
+                  <!-- Appointment date -->
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <Label text="Data Appunt.:" styleClass="filter-label" minWidth="180"/>
+                     <DatePicker fx:id="datePicker" editable="false" prefWidth="250.0" styleClass="filter-input"/>
+                  </HBox>
+
+                  <HBox alignment="CENTER" spacing="10.0" fx:id="callbackDateBox">
+                     <Label minWidth="180" styleClass="filter-label" text="Data Callback:"/>
+                     <DatePicker fx:id="callbackDatePicker" editable="false" prefWidth="250.0" styleClass="filter-input" />
+                  </HBox>
+
+                  <!-- Insurance note -->
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <Label text="Note (opzionali):" styleClass="filter-label" minWidth="180"/>
+                     <TextArea fx:id="noteTextArea" prefHeight="80.0" prefWidth="250.0" wrapText="true" styleClass="filter-input"/>
+                  </HBox>
+
+                  <!-- Centered Dashboard Button -->
+                  <Text fx:id="infoText" textAlignment="CENTER"/>
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <Button fx:id="dashboardButton" mnemonicParsing="false" onAction="#switchToDashboard" text="Dashboard" styleClass="action-button"/>
+                     <Button fx:id="annullaButton" mnemonicParsing="false" onAction="#switchToCallbacksList" text="Indietro" styleClass="action-button"/>
+                     <Button fx:id="actionButton" text="Modifica" onAction="#updateCallback" mnemonicParsing="false" styleClass="action-button"/>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </center>
+
+</BorderPane>

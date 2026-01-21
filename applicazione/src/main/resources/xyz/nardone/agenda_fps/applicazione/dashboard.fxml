@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.chart.PieChart?>
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.DashboardController" stylesheets="@stiles.css">
+    <!-- Side Navigation -->
+    <left>
+        <fx:include source="navigator.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20.0" alignment="CENTER" prefWidth="1000.0">
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <children>
+
+                <!-- Header Section (Dashboard Title) -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    </children>
+                </HBox>
+
+                <!-- Statistics Grid (Restricted Width) -->
+                <VBox alignment="CENTER" maxWidth="800"> <!-- Restricts width -->
+                    <Label text="Statische Generali" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                    <GridPane styleClass="grid-container" maxWidth="800" hgap="20">
+                        <!-- Matches Piechart Section Width -->
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints vgrow="NEVER"/>
+                        </rowConstraints>
+                        <children>
+                            <!-- Family Bankers -->
+                            <VBox GridPane.columnIndex="0" alignment="CENTER" styleClass="grid-table">
+                                <Label fx:id="familyBankers" text="0" styleClass="grid-title"/>
+                                <Label text="Family Bankers" styleClass="grid-label"/>
+                            </VBox>
+
+                            <!-- Appointments -->
+                            <VBox GridPane.columnIndex="1" alignment="CENTER" styleClass="grid-table">
+                                <Label fx:id="appointments" text="0" styleClass="grid-title"/>
+                                <Label text="Appuntamenti" styleClass="grid-label"/>
+                            </VBox>
+
+                            <!-- Sottoscrizioni -->
+                            <VBox GridPane.columnIndex="2" alignment="CENTER" styleClass="grid-table">
+                                <Label fx:id="sottoscrizioni" text="0" styleClass="grid-title"/>
+                                <Label text="Sottoscrizioni" styleClass="grid-label"/>
+                            </VBox>
+
+                            <!-- Premi Totali -->
+                            <VBox GridPane.columnIndex="3" alignment="CENTER" style="-fx-background-color: #d4edda; -fx-border-color: #28a745; -fx-border-width: 1; -fx-border-radius: 5; -fx-padding: 10;">
+                                <Label fx:id="premi" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+                                <Label text="Premi Totali" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+                            </VBox>
+
+                            <VBox GridPane.columnIndex="4" alignment="CENTER" style="-fx-background-color: #f8d7da; -fx-border-color: #d9534f; -fx-border-width: 1; -fx-border-radius: 5; -fx-padding: 10;">
+                                <Label text="Oggi hai" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #d9534f;"/>
+                                <Label fx:id="callbacks" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #d9534f;"/>
+                                <Label text="Callbacks" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #d9534f;"/>
+                            </VBox>
+                        </children>
+                    </GridPane>
+                </VBox>
+
+                <!-- Action Buttons & Pie Chart Section (Max Width Controlled) -->
+                <VBox spacing="20.0" alignment="CENTER" maxWidth="800"> <!-- Matches Grid Width -->
+                    <children>
+
+                        <!-- Buttons Section -->
+                        <VBox spacing="10.0" styleClass="piechart-container" alignment="CENTER">
+                            <HBox spacing="10">
+                                <Button fx:id="addAppointmentButton" text="Aggiungi Appuntamento" onAction="#switchToAddAppointments" styleClass="action-button" prefWidth="180.0" prefHeight="40.0"/>
+                                <Button text="Aggiungi Cliente" onAction="#switchToAddClient" styleClass="action-button" prefWidth="180.0" prefHeight="40.0"/>
+                                <Button text="Aggiungi FB" onAction="#switchToAddBanker" styleClass="action-button" prefWidth="180.0" prefHeight="40.0"/>
+                                <Button text="Statistiche FB" onAction="#switchToBankerSelection" styleClass="action-button" prefWidth="180.0" prefHeight="40.0"/>
+                            </HBox>
+                            <!-- Pie Chart  -->
+                            <Label text="Distribuzione Appuntamenti" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                            <PieChart fx:id="appointmentsPieChart" styleClass="piechart"
+                                      prefWidth="450" VBox.vgrow="ALWAYS"
+                                      maxWidth="Infinity" maxHeight="Infinity"/>
+                        </VBox>
+
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
+    </center>
+
+</BorderPane>

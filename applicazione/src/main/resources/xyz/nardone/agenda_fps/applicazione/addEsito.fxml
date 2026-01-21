@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.AddEsitoController"
+            stylesheets="@stiles.css" prefHeight="320">
+
+    <!-- Side Navigation -->
+    <left>
+        <fx:include source="navigator.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20.0" prefWidth="600.0" alignment="CENTER">
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <children>
+                <!-- Header Section -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Esito" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label text="Aggiungi" style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
+                    </children>
+                </HBox>
+
+                <!-- Form layout -->
+                <VBox alignment="CENTER" spacing="15.0" styleClass="filter-container" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0"
+                      AnchorPane.topAnchor="70.0">
+                    <children>
+
+                        <!-- polizza-->
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <Label layoutX="20.0" styleClass="filter-label"  text="Esito*:" minWidth="180"/>
+                            <TextField fx:id="Esito"  styleClass="filter-input" prefWidth="250.0" />
+                        </HBox>
+                        <!-- Centered Dashboard Button -->
+
+                        <Text fx:id="infoText" textAlignment="CENTER"/>
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <Button fx:id="dashboardButton" mnemonicParsing="false" onAction="#switchToDashboard" text="Dashboard" styleClass="action-button"/>
+                            <Button fx:id="annullaButton" mnemonicParsing="false" onAction="#switchToEsiti" text="Indietro" styleClass="action-button"/>
+                            <Button fx:id="addEsitoButton" mnemonicParsing="false" onAction="#addEsito" text="Aggiungi" styleClass="action-button"/>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

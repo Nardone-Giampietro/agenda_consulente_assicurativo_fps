@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="xyz.nardone.agenda_fps.applicazione.controllers.AppointmentsListController"
+            stylesheets="@stiles.css" prefHeight="1000">
+
+    <!-- Side Navigation -->
+    <left>
+        <fx:include source="navigator.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20.0" prefWidth="1000.0">
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <children>
+                <!-- Header Section -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label text="Appuntamenti" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label text="Lista" style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
+                    </children>
+                </HBox>
+
+                <!-- Filter and Table Section -->
+                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                    <!-- Filter Section -->
+                    <HBox spacing="15.0" alignment="CENTER_LEFT" styleClass="filter-container">
+                        <children>
+                            <Label text="Family Banker:" styleClass="filter-label"/>
+                            <ComboBox fx:id="BankersComboBox" promptText="Seleziona" prefWidth="150.0" styleClass="filter-input"/>
+                            <Label text="Date:" styleClass="filter-label"/>
+                            <DatePicker fx:id="startDatePicker" promptText="Data inizio" styleClass="filter-input" editable="false"/>
+                            <DatePicker fx:id="endDatePicker" promptText="Data fine" styleClass="filter-input" editable="false"/>
+                            <Button fx:id="applyFilterButton" text="Applica" styleClass="filter-button" onAction="#applyFilter"/>
+                            <Button fx:id="resetFilterButton" text="Azzera Filtri" styleClass="filter-button" onAction="#resetFilter"/>
+                        </children>
+                    </HBox>
+
+                    <!-- TableView and Dashboard Button Section -->
+                    <VBox spacing="10.0" alignment="CENTER" VBox.vgrow="ALWAYS">
+                        <children>
+
+                            <!-- TableView Container -->
+                            <VBox VBox.vgrow="ALWAYS" fx:id="tableContainer">
+                                <TableView fx:id="appointmentsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
+                                    <contextMenu>
+                                        <ContextMenu fx:id="contextMenu" styleClass="context-menu">
+                                            <items>
+                                                <MenuItem fx:id="menuItem" mnemonicParsing="false" onAction="#remove" text="Rimuovi" styleClass="menu-item"/>
+                                                <MenuItem fx:id="menuItemVisualize" mnemonicParsing="false" onAction="#switchToAppointmentVisualizeAndUpdate" text="Modifica" styleClass="menu-item"/>
+                                            </items>
+                                        </ContextMenu>
+                                    </contextMenu>
+                                    <placeholder>
+                                        <Label text="Nessun appuntamento trovato" style="-fx-text-fill: gray; -fx-font-style: italic;"/>
+                                    </placeholder>
+                                </TableView>
+                            </VBox>
+
+                            <!-- Statistics Section -->
+                            <HBox spacing="20.0" alignment="CENTER">
+                                <children>
+                                    <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #ecf0f1; -fx-border-color: #dcdcdc; -fx-border-width: 1; -fx-padding: 10;" prefWidth="250.0">
+                                        <Label fx:id="appuntamenti" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+                                        <Label text="Appuntamenti" style="-fx-font-size: 14px;" />
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #ecf0f1; -fx-border-color: #dcdcdc; -fx-border-width: 1; -fx-padding: 10;" prefWidth="250.0">
+                                        <Label fx:id="sottoscrizioni" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+                                        <Label text="Sottoscrizioni" style="-fx-font-size: 14px;" />
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #ecf0f1; -fx-border-color: #dcdcdc; -fx-border-width: 1; -fx-padding: 10;" prefWidth="250.0">
+                                        <Label fx:id="premi" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+                                        <Label text="Premi Totali" style="-fx-font-size: 14px;" />
+                                    </HBox>
+                                </children>
+                            </HBox>
+
+                            <!-- Centered Dashboard Button -->
+                            <Text fx:id="infoText" textAlignment="CENTER" />
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Button fx:id="dashboardButton" mnemonicParsing="false" onAction="#switchToDashboard" text="Dashboard" styleClass="action-button"/>
+                                <Button fx:id="addAppointmentButton" mnemonicParsing="false" onAction="#switchToAddAppointment" text="Aggiungi Appuntamento" styleClass="action-button"/>
+                            </HBox>
+                        </children>
+                    </VBox>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>
