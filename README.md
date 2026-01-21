@@ -2,6 +2,8 @@
 
 **Agenda FPS** è un’applicazione desktop sviluppata in **Java** per la gestione operativa dell’attività dei *Family Banker* (consulenti), con funzioni dedicate a **appuntamenti**, **clienti**, **callback** (richiami) e **statistiche**. L’obiettivo è offrire una vista centralizzata e strumenti rapidi per inserire, consultare, filtrare e aggiornare i dati, supportando il monitoraggio delle performance tramite dashboard, grafici e tabelle.
 
+## Documentazione
+Javadoc: https://nardone-giampietro.github.io/agenda_consulente_assicurativo_fps/
 ---
 
 ## Dashboard (Board)
