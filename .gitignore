@@ -1,0 +1,6 @@
+.DS_Store
+**/target/
+**/.idea/
+.local/
+*.log
+node_modules/
