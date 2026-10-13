@@ -11,10 +11,17 @@ public final class ClientNames {
   }
 
   public static String person(String value) {
-    return clean(value).toLowerCase(Locale.ROOT);
+    return bounded(clean(value).toLowerCase(Locale.ROOT), 100);
   }
 
   public static String company(String value) {
-    return clean(value).toUpperCase(Locale.ROOT);
+    return bounded(clean(value).toUpperCase(Locale.ROOT), 150);
+  }
+
+  private static String bounded(String value, int maximum) {
+    if (value.length() > maximum)
+      throw xyz.nardone.agenda_wa.servizio.exception.ApplicationErrors.bad(
+          "Il nome normalizzato supera il limite di " + maximum + " caratteri.");
+    return value;
   }
 }

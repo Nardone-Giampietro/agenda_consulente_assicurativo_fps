@@ -1,31 +1,51 @@
 package xyz.nardone.agenda_wa.servizio.repository;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
-import java.util.Objects;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
+import java.util.ArrayList;
+import java.util.Optional;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import xyz.nardone.agenda_wa.servizio.repository.query.Queries;
 
-/** Shared query execution; the owner predicate is applied before any database access. */
-abstract class OwnedQuerySupport<T> {
-  protected final MongoTemplate mongo;
-  protected final Class<T> entity;
+abstract class OwnedQuerySupport {
+  protected final JdbcTemplate jdbc;
 
-  protected OwnedQuerySupport(MongoTemplate mongo, Class<T> entity) {
-    this.mongo = mongo;
-    this.entity = entity;
+  protected OwnedQuerySupport(JdbcTemplate jdbc, SqlSchemaRepository schema) {
+    this.jdbc = jdbc;
   }
 
-  protected Query owned(String ownerId, Query query) {
-    return query.addCriteria(where("ownerId").is(Objects.requireNonNull(ownerId)));
+  protected long count(String table, Queries.Filter filter) {
+    return jdbc.queryForObject(
+        "SELECT COUNT(*) FROM " + table + " WHERE " + filter.sql(), Long.class, filter.args());
   }
 
-  protected RepositoryPage<T> page(String ownerId, Query filter, int page, int size, Sort sort) {
-    Query query = owned(ownerId, filter);
-    long total = mongo.count(query, entity);
+  protected <T> Optional<T> one(String table, RowMapper<T> mapper, String id, String owner) {
+    return jdbc
+        .query("SELECT * FROM " + table + " WHERE id=? AND owner_id=?", mapper, id, owner)
+        .stream()
+        .findFirst();
+  }
+
+  protected <T> RepositoryPage<T> page(
+      String table, RowMapper<T> mapper, Queries.Filter filter, String order, int page, int size) {
+    Queries.paginate(page, size);
+    var args = new ArrayList<>(filter.values());
+    args.add(size);
+    args.add((long) page * size);
     return new RepositoryPage<>(
-        mongo.find(Queries.paginate(query, page, size).with(sort), entity), total);
+        jdbc.query(
+            "SELECT * FROM "
+                + table
+                + " WHERE "
+                + filter.sql()
+                + " ORDER BY "
+                + order
+                + " LIMIT ? OFFSET ?",
+            mapper,
+            args.toArray()),
+        count(table, filter));
+  }
+
+  protected long delete(String table, Queries.Filter filter) {
+    return jdbc.update("DELETE FROM " + table + " WHERE " + filter.sql(), filter.args());
   }
 }

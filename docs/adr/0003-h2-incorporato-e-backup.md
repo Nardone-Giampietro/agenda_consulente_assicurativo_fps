@@ -1,0 +1,3 @@
+# H2 incorporato e backup applicativi
+
+L’edizione locale usa H2 persistente nello stesso processo Java, con repository JDBC e transazioni, eliminando l’installazione e la gestione del replica set MongoDB. Lo storico dei clienti è ricavato dagli appuntamenti; backup automatici locali ed esportazione/ripristino dall’interfaccia usano un formato JSON versionato e validato, per conservare la portabilità dei dati senza eseguire SQL proveniente dai file caricati. Su richiesta dell’utente, il trasferimento dell’agenda esistente comprende soltanto clienti e nomi delle polizze: appuntamenti e callback dimostrativi restano nel MongoDB originale e non vengono importati.

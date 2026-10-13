@@ -110,7 +110,7 @@ public class SecurityConfiguration {
                         "/js/**",
                         "/api/auth/csrf")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register")
+                    .requestMatchers(HttpMethod.POST, "/api/auth/login")
                     .permitAll()
                     .requestMatchers("/error")
                     .permitAll()
@@ -135,7 +135,7 @@ public class SecurityConfiguration {
                 resource
                     .bearerTokenResolver(
                         request -> {
-                          if (List.of("/api/auth/login", "/api/auth/register", "/api/auth/csrf")
+                          if (List.of("/api/auth/login", "/api/auth/csrf")
                               .contains(request.getServletPath())) return null;
                           String header = headerResolver.resolve(request);
                           if (header != null) return header;
@@ -153,13 +153,23 @@ public class SecurityConfiguration {
                                 token -> {
                                   User user = users.findById(token.getSubject()).orElse(null);
                                   Object claim = token.getClaims().get("version");
-                                  if (user == null
+                                  if (!LocalIdentity.ID.equals(token.getSubject())
+                                      || user == null
                                       || !(claim instanceof Number version)
                                       || user.tokenVersion() != version.longValue())
                                     throw new BadCredentialsException("Sessione non valida.");
                                   return new JwtAuthenticationToken(token, List.of(), user.id());
                                 })))
-        .headers(headers -> headers.cacheControl(cache -> {}));
+        .headers(
+            headers ->
+                headers
+                    .cacheControl(cache -> {})
+                    .contentSecurityPolicy(
+                        policy ->
+                            policy.policyDirectives(
+                                "default-src 'self'; script-src 'self'; style-src 'self'"
+                                    + " 'unsafe-inline'; img-src 'self' data:; font-src 'self';"
+                                    + " connect-src 'self'; frame-ancestors 'none'")));
     return http.build();
   }
 

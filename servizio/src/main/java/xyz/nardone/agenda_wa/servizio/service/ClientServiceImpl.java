@@ -1,17 +1,17 @@
 package xyz.nardone.agenda_wa.servizio.service;
 
-import xyz.nardone.agenda_wa.servizio.DTO.client.ClientAppointmentDTO;
-import static xyz.nardone.agenda_wa.servizio.exception.ApplicationErrors.missing;
 import static xyz.nardone.agenda_wa.servizio.exception.ApplicationErrors.bad;
+import static xyz.nardone.agenda_wa.servizio.exception.ApplicationErrors.missing;
 
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xyz.nardone.agenda_wa.servizio.DTO.client.ClientAppointmentDTO;
 import xyz.nardone.agenda_wa.servizio.DTO.client.ClientRequestDTO;
 import xyz.nardone.agenda_wa.servizio.DTO.client.ClientSummaryDTO;
 import xyz.nardone.agenda_wa.servizio.DTO.common.PageDTO;
-import xyz.nardone.agenda_wa.servizio.entity.Client;
 import xyz.nardone.agenda_wa.servizio.entity.Appointment;
+import xyz.nardone.agenda_wa.servizio.entity.Client;
 import xyz.nardone.agenda_wa.servizio.mapper.ClientMapper;
 import xyz.nardone.agenda_wa.servizio.repository.AppointmentRepository;
 import xyz.nardone.agenda_wa.servizio.repository.CallbackRepository;
@@ -20,24 +20,30 @@ import xyz.nardone.agenda_wa.servizio.security.UserScope;
 import xyz.nardone.agenda_wa.servizio.service.interfaces.ClientService;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(
+    readOnly = true,
+    isolation = org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
 public class ClientServiceImpl implements ClientService {
   private final ClientRepository clients;
   private final AppointmentRepository appointments;
   private final CallbackRepository callbacks;
   private final ClientMapper mapper;
   private final UserScope scope;
+  private final xyz.nardone.agenda_wa.servizio.repository.SqlOperationLock operationLock;
 
   public ClientServiceImpl(
       ClientRepository clients,
       AppointmentRepository appointments,
       CallbackRepository callbacks,
       ClientMapper mapper,
+      xyz.nardone.agenda_wa.servizio.repository.SqlOperationLock operationLock,
       UserScope scope) {
     this.clients = clients;
     this.appointments = appointments;
     this.callbacks = callbacks;
     this.mapper = mapper;
     this.scope = scope;
+    this.operationLock = operationLock;
   }
 
   @Override
@@ -55,6 +61,7 @@ public class ClientServiceImpl implements ClientService {
   @Override
   @Transactional
   public Client saveClient(String id, ClientRequestDTO request) {
+    operationLock.acquire();
     if (request.tipo() == null || !request.isIdentityValid())
       throw bad("Inserisci le generalità richieste per il tipo di cliente.");
     if (id != null) {
@@ -62,7 +69,8 @@ public class ClientServiceImpl implements ClientService {
       if (client(id).tipo() != request.tipo())
         throw bad("Il tipo di cliente non può essere modificato.");
     }
-    Client saved = mapper.toEntity(id == null ? UUID.randomUUID().toString() : id, scope.id(), request);
+    Client saved =
+        mapper.toEntity(id == null ? UUID.randomUUID().toString() : id, scope.id(), request);
     if (id == null) clients.insert(saved);
     else clients.updateDetails(scope.id(), saved);
     if (id != null)
@@ -71,11 +79,10 @@ public class ClientServiceImpl implements ClientService {
   }
 
   @Override
-  public PageDTO<ClientAppointmentDTO> history(
-      String id, int page, int size) {
+  public PageDTO<ClientAppointmentDTO> history(String id, int page, int size) {
     var result = clients.history(scope.id(), id, page, size);
-    return new PageDTO<>(result.items().stream().map(mapper::toAppointmentDTO).toList(),
-        result.total(), page, size);
+    return new PageDTO<>(
+        result.items().stream().map(mapper::toAppointmentDTO).toList(), result.total(), page, size);
   }
 
   /** Parent writes serialize dependent activity inserts with deletion of their client. */
@@ -87,6 +94,7 @@ public class ClientServiceImpl implements ClientService {
   @Override
   @Transactional
   public void deleteClient(String id) {
+    operationLock.acquire();
     lockClient(id);
     String owner = scope.id();
     appointments.deleteByOwnerIdAndClientId(owner, id);
@@ -97,6 +105,7 @@ public class ClientServiceImpl implements ClientService {
   @Override
   @Transactional
   public void clearClients() {
+    operationLock.acquire();
     String owner = scope.id();
     clients.findByOwnerId(owner).forEach(c -> lockClient(c.id()));
     appointments.deleteByOwnerId(owner);

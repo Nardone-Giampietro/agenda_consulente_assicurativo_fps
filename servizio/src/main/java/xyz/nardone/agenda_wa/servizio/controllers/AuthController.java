@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.nardone.agenda_wa.servizio.DTO.auth.LoginRequestDTO;
 import xyz.nardone.agenda_wa.servizio.DTO.auth.ProfileDTO;
-import xyz.nardone.agenda_wa.servizio.DTO.auth.RegisterRequestDTO;
 import xyz.nardone.agenda_wa.servizio.entity.User;
 import xyz.nardone.agenda_wa.servizio.mapper.UserMapper;
 import xyz.nardone.agenda_wa.servizio.security.LoginAttempts;
@@ -50,16 +49,10 @@ public class AuthController {
     return token;
   }
 
-  @PostMapping("/register")
-  public ResponseEntity<ProfileDTO> register(
-      @Valid @RequestBody RegisterRequestDTO request, HttpServletRequest http) {
-    return session(auth.register(request), http, HttpStatus.CREATED);
-  }
-
   @PostMapping("/login")
   public ResponseEntity<ProfileDTO> login(
       @Valid @RequestBody LoginRequestDTO request, HttpServletRequest http) {
-    String key = http.getRemoteAddr() + "|" + request.email();
+    String key = http.getRemoteAddr() + "|locale";
     attempts.check(key);
     User user;
     try {

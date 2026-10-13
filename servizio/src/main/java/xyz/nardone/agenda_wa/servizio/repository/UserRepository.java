@@ -1,17 +1,35 @@
 package xyz.nardone.agenda_wa.servizio.repository;
 
 import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.mongodb.repository.Update;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import xyz.nardone.agenda_wa.servizio.entity.User;
 
-public interface UserRepository extends MongoRepository<User, String> {
-  Optional<User> findByEmail(String email);
+@Repository
+public class UserRepository {
+  private final JdbcTemplate jdbc;
 
-  boolean existsByEmail(String email);
+  public UserRepository(JdbcTemplate jdbc, SqlSchemaRepository schema) {
+    this.jdbc = jdbc;
+  }
 
-  @Query("{'_id': ?0}")
-  @Update("{'$inc': {'tokenVersion': 1}}")
-  long revokeTokens(String id);
+  public Optional<User> findById(String id) {
+    return jdbc.query("SELECT * FROM utenti WHERE id=?", PersistenceRows.USER, id).stream()
+        .findFirst();
+  }
+
+  public User insert(User u) {
+    jdbc.update(
+        "INSERT INTO utenti(id,nome,cognome,email,token_version) VALUES(?,?,?,?,?)",
+        u.id(),
+        u.nome(),
+        u.cognome(),
+        u.email(),
+        u.tokenVersion());
+    return u;
+  }
+
+  public long revokeTokens(String id) {
+    return jdbc.update("UPDATE utenti SET token_version=token_version+1 WHERE id=?", id);
+  }
 }

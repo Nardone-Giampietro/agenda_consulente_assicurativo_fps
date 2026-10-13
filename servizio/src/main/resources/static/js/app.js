@@ -2,6 +2,7 @@ import { setupAuth } from "./auth.js";
 import { api, query } from "./api.js";
 import { escape, decorate } from "./ui.js";
 import { overview, listing, settings } from "./views.js";
+import { setupBackups } from "./backup.js";
 import { setupAppointmentDeletion } from "./deletion.js";
 import {
   openEditor,
@@ -119,7 +120,7 @@ async function render() {
     if (version !== loadVersion) return;
     main.innerHTML = content;
     decorate(main);
-    if (route === "impostazioni") setupAppointmentDeletion(context);
+    if (route === "impostazioni") { setupAppointmentDeletion(context); setupBackups(context); }
     document.querySelector("#filters")?.addEventListener("submit", (event) => {
       event.preventDefault();
       state.filters = Object.fromEntries(new FormData(event.target));

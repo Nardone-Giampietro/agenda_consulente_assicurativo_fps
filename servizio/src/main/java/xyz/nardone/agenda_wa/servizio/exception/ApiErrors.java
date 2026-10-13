@@ -1,6 +1,5 @@
 package xyz.nardone.agenda_wa.servizio.exception;
 
-import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -55,13 +54,13 @@ public class ApiErrors {
         HttpStatus.CONFLICT, "Esiste già un record con questi dati.");
   }
 
-  @ExceptionHandler({DataAccessException.class, MongoException.class})
+  @ExceptionHandler(DataAccessException.class)
   ProblemDetail database(Exception e) {
-    log.error("MongoDB operation failed", e);
+    log.error("Database operation failed: {}", e.getClass().getSimpleName());
     return ProblemDetail.forStatusAndDetail(
         HttpStatus.SERVICE_UNAVAILABLE,
         "Il database non è disponibile oppure i dati sono stati modificati nel frattempo. Controlla"
-            + " MongoDB e riprova.");
+            + " lo spazio disponibile sul computer e riprova.");
   }
 
   @ExceptionHandler(Exception.class)

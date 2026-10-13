@@ -181,9 +181,16 @@ export function settings(catalogs, openCatalogs = new Set()) {
   return (
     pageHeading(
       "Impostazioni",
-      "Personalizza esiti e polizze della tua agenda.",
+      "Gestisci cataloghi e copie dei dati della tua agenda.",
     ) +
     `<div class="settings-grid">${panel("esiti", "Esiti degli appuntamenti", "Nuovo esito")}${panel("polizze", "Polizze", "Nuova polizza")}</div>
+    <section class="panel backup-panel"><div class="panel-head"><h2>Backup dell’agenda</h2></div><div class="panel-body backup-body">
+      <p class="muted">Le copie automatiche vengono salvate su questo computer ogni 15 minuti quando i dati cambiano. Esporta un backup per conservarlo anche altrove.</p>
+      <p id="backup-status" class="backup-status" role="status">Verifica delle copie automatiche…</p>
+      <div class="backup-controls"><div><h3>Esporta i dati</h3><p class="muted">Salva clienti, cataloghi, appuntamenti e callback in un unico file.</p><button class="button secondary" id="backup-export" type="button">Esporta backup</button></div>
+        <form id="backup-restore-form"><h3>Ripristina i dati</h3><div class="field"><label for="backup-file">File di backup</label><input id="backup-file" name="file" type="file" accept=".json,application/json" required aria-describedby="backup-file-hint"></div><p id="backup-file-hint" class="muted">Il ripristino sostituisce l’agenda attuale. Prima viene salvata una copia dei dati presenti.</p><button class="button secondary outline-danger" type="submit">Ripristina backup</button></form></div>
+      <p class="form-error" id="backup-error" role="alert" hidden></p></div>
+    </section>
     <section class="panel reset-panel"><div class="panel-head"><h2>Gestione dei dati</h2></div>
       <div class="deletion-panel"><h3>Elimina appuntamenti</h3><p class="muted">Seleziona il periodo. I clienti e i callback vengono conservati.</p>
         <form id="appointment-deletion-filters">

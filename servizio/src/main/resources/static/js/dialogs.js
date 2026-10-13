@@ -289,6 +289,19 @@ export function askAppointmentDeletion(selection, count, summary, context) {
   );
 }
 
+export function askBackupRestore(file, context) {
+  removing = { kind: "backup", file, context };
+  showConfirmation(
+    "Ripristina backup",
+    "I dati del file sostituiranno clienti, cataloghi, appuntamenti e callback presenti. Una copia dell’agenda attuale verrà conservata prima del ripristino. Al termine dovrai accedere nuovamente.",
+    false,
+  );
+  document.querySelector("#confirmation-input").innerHTML = field(
+    "Scrivi RIPRISTINA per confermare", "confirm", "text", "",
+    'required autocomplete="off" pattern="RIPRISTINA"',
+  );
+}
+
 function showConfirmation(title, text, reset) {
   document.querySelector("#confirmation-title").textContent = title;
   document.querySelector("#confirmation-text").textContent = text;
@@ -303,6 +316,7 @@ function showConfirmation(title, text, reset) {
     : "";
   error(document.querySelector("#confirmation-error"), "");
   confirmation.querySelector("[type=submit]").disabled = false;
+  confirmation.querySelector("[type=submit]").textContent = removing?.kind === "backup" ? "Ripristina" : "Elimina";
   confirmation.showModal();
 }
 export function setupDialogs() {
@@ -450,7 +464,7 @@ export function setupDialogs() {
       const button = confirmation.querySelector("[type=submit]");
       deleting = true;
       button.disabled = true;
-      button.textContent = "Eliminazione…";
+      button.textContent = task.kind === "backup" ? "Ripristino…" : "Eliminazione…";
       confirmation.querySelectorAll("[data-close]").forEach((control) => {
         control.disabled = true;
       });
@@ -459,12 +473,23 @@ export function setupDialogs() {
         const params = task.selection
           ? `?${query({ ...task.selection, attesi: task.expected })}`
           : "";
-        const result = await api(
-          `${path(task.kind)}${task.id ? `/${task.id}` : ""}${params}`,
-          { method: "DELETE" },
-        );
+        let result;
+        if (task.kind === "backup") {
+          const body = new FormData();
+          body.set("file", task.file);
+          result = await api("backup/ripristino", { method: "POST", body });
+        } else {
+          result = await api(
+            `${path(task.kind)}${task.id ? `/${task.id}` : ""}${params}`,
+            { method: "DELETE" },
+          );
+        }
         if (removing !== task || !task.context.active()) return;
         confirmation.close();
+        if (task.kind === "backup") {
+          window.dispatchEvent(new Event("agenda-restored"));
+          return;
+        }
         const message = task.selection
           ? result.eliminati === 1
             ? "Eliminato 1 appuntamento."

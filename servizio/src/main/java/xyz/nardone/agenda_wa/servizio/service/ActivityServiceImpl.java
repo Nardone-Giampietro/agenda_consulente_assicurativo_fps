@@ -35,6 +35,9 @@ import xyz.nardone.agenda_wa.servizio.service.interfaces.CatalogService;
 import xyz.nardone.agenda_wa.servizio.service.interfaces.ClientService;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(
+    readOnly = true,
+    isolation = org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
 public class ActivityServiceImpl implements ActivityService {
   private final AppointmentRepository appointments;
   private final CallbackRepository callbacks;
@@ -44,6 +47,7 @@ public class ActivityServiceImpl implements ActivityService {
   private final CatalogService catalogs;
   private final ActivityMapper mapper;
   private final UserScope scope;
+  private final xyz.nardone.agenda_wa.servizio.repository.SqlOperationLock operationLock;
   private final Clock clock;
 
   public ActivityServiceImpl(
@@ -54,6 +58,7 @@ public class ActivityServiceImpl implements ActivityService {
       ClientService clientService,
       CatalogService catalogs,
       ActivityMapper mapper,
+      xyz.nardone.agenda_wa.servizio.repository.SqlOperationLock operationLock,
       UserScope scope,
       Clock clock) {
     this.appointments = appointments;
@@ -64,6 +69,7 @@ public class ActivityServiceImpl implements ActivityService {
     this.catalogs = catalogs;
     this.mapper = mapper;
     this.scope = scope;
+    this.operationLock = operationLock;
     this.clock = clock;
   }
 
@@ -101,6 +107,7 @@ public class ActivityServiceImpl implements ActivityService {
   @Override
   @Transactional
   public Appointment saveAppointment(String id, AppointmentRequestDTO request) {
+    operationLock.acquire();
     Appointment previous = id == null ? null : requireAppointment(id);
     if (previous != null && !previous.clientId().equals(request.clientId()))
       clientService.lockClient(previous.clientId());
@@ -116,7 +123,8 @@ public class ActivityServiceImpl implements ActivityService {
       throw bad("Per un appuntamento esistente, aggiungi il callback dalla sezione Callback.");
     validateCallbackDate(request.dataCallback(), request.data());
     Appointment saved =
-        appointments.save(
+        saveAppointmentEntity(
+            id,
             mapper.toEntity(
                 id == null ? UUID.randomUUID().toString() : id,
                 scope.id(),
@@ -125,22 +133,28 @@ public class ActivityServiceImpl implements ActivityService {
                 outcome,
                 policy == null ? null : catalogs.item("polizze", policy)));
     if (request.creaCallback())
-      callbacks.save(
+      callbacks.insert(
           mapper.toCallback(UUID.randomUUID().toString(), saved, request.dataCallback()));
-    clients.rebuildAppointmentHistory(scope.id(), saved.clientId());
-    if (previous != null && !previous.clientId().equals(saved.clientId()))
-      clients.rebuildAppointmentHistory(scope.id(), previous.clientId());
     return saved;
   }
 
   @Override
   @Transactional
   public Callback saveCallback(String id, CallbackRequestDTO request) {
+    operationLock.acquire();
     if (id != null) requireCallback(id);
     clientService.lockClient(request.clientId());
     validateCallbackDate(request.data(), request.dataAppuntamento());
-    return callbacks.save(
-        mapper.toEntity(id == null ? UUID.randomUUID().toString() : id, scope.id(), request));
+    return saveCallbackEntity(
+        id, mapper.toEntity(id == null ? UUID.randomUUID().toString() : id, scope.id(), request));
+  }
+
+  private Appointment saveAppointmentEntity(String previousId, Appointment a) {
+    return previousId == null ? appointments.insert(a) : appointments.update(a);
+  }
+
+  private Callback saveCallbackEntity(String previousId, Callback c) {
+    return previousId == null ? callbacks.insert(c) : callbacks.update(c);
   }
 
   private void validateCallbackDate(LocalDate callback, LocalDate appointment) {
@@ -152,15 +166,16 @@ public class ActivityServiceImpl implements ActivityService {
   @Override
   @Transactional
   public void deleteAppointment(String id) {
+    operationLock.acquire();
     Appointment previous = requireAppointment(id);
     clientService.lockClient(previous.clientId());
     appointments.deleteByIdAndOwnerId(id, scope.id());
-    clients.rebuildAppointmentHistory(scope.id(), previous.clientId());
   }
 
   @Override
   @Transactional
   public void deleteCallback(String id) {
+    operationLock.acquire();
     requireCallback(id);
     callbacks.deleteByIdAndOwnerId(id, scope.id());
   }
@@ -179,17 +194,21 @@ public class ActivityServiceImpl implements ActivityService {
   @Override
   @Transactional
   public long deleteSelectedAppointments(AppointmentSelectionDTO selection, long expected) {
+    operationLock.acquire();
     if (expected < 0) throw bad("Il numero di appuntamenti attesi non è valido.");
     String esito = selection == null ? null : outcomeName(selection.esitoId());
     String owner = scope.id();
-    var affected = appointments.selectionClientIds(owner, selection, esito).stream().sorted().toList();
+    var affected =
+        appointments.selectionClientIds(owner, selection, esito).stream().sorted().toList();
     affected.forEach(clientService::lockClient);
     if (appointments.countSelection(owner, selection, esito) != expected)
       throw new ResponseStatusException(
           HttpStatus.CONFLICT,
           "Gli appuntamenti sono cambiati. Verifica di nuovo la selezione prima di eliminare.");
     long deleted = appointments.deleteSelection(owner, selection, esito);
-    affected.forEach(clientId -> clients.rebuildAppointmentHistory(owner, clientId));
+    if (deleted != expected)
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "Gli appuntamenti sono cambiati. Verifica di nuovo la selezione.");
     return deleted;
   }
 

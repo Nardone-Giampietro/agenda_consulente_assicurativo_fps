@@ -1,9 +1,9 @@
 # Indicazioni per questo progetto
 
-- L’applicazione è Agenda WA, con backend Java/Spring Boot e MongoDB locale. Usare «Callback» nell’interfaccia. Le anagrafiche sono esclusivamente quelle dei clienti; ogni appuntamento e callback si riferisce a un cliente. La risorsa dei callback usa `/api/callback`, la collezione `callback` e i campi `creaCallback`, `dataCallback` e `callbackOggi`.
+- L’applicazione è Agenda WA, con backend Java/Spring Boot e H2 incorporato su disco nel branch `codex/versione-locale`. Usare «Callback» nell’interfaccia. Le anagrafiche sono esclusivamente quelle dei clienti; ogni appuntamento e callback si riferisce a un cliente. La risorsa dei callback usa `/api/callback`, la tabella `callback` e i campi `creaCallback`, `dataCallback` e `callbackOggi`.
 - Non aggiungere script personalizzati di avvio, arresto, migrazione o manutenzione. Documentare i comandi manuali nel README; conservare il wrapper Maven per la compilazione.
-- Al termine di ogni task, arrestare i servizi applicativi avviati o usati per lo sviluppo e le verifiche e controllare che le relative porte siano libere. MongoDB può restare attivo. Identificare i processi prima dell’arresto, senza coinvolgere servizi di altri progetti; completare questa pulizia anche se una verifica fallisce e riportarne l’esito.
-- Dopo ogni task che modifica il database, rimuovere tutti i database e le collezioni di test creati per quel task e le collezioni dell’agenda confermate obsolete. La pulizia finale è parte del lavoro richiesto dall’utente, anche quando una verifica fallisce.
+- Al termine di ogni task, arrestare i servizi applicativi avviati o usati per lo sviluppo e le verifiche e controllare che le relative porte siano libere. Il MongoDB originale della versione online può restare attivo. Identificare i processi prima dell’arresto, senza coinvolgere servizi di altri progetti; completare questa pulizia anche se una verifica fallisce e riportarne l’esito.
+- Dopo ogni task che modifica il database, rimuovere tutti i database, cartelle H2 e collezioni di test creati per quel task e le collezioni dell’agenda confermate obsolete. La pulizia finale è parte del lavoro richiesto dall’utente, anche quando una verifica fallisce.
 - Usare database di verifica separati con prefisso `agenda_wa_test_`. I test di integrazione eliminano il proprio database al termine; controllare anche gli eventuali database usati per le prove nel browser.
 - Prima della pulizia, verificare la connessione effettiva, le collezioni usate dal codice corrente e la destinazione esatta. Conservare i dati applicativi attivi e i database di sistema MongoDB (`admin`, `config`, `local`); non cancellare database di altri progetti.
 - Conservare i dati dimostrativi inseriti nell’agenda su esplicita richiesta dell’utente: sono dati applicativi destinati alle sue prove, non residui delle verifiche automatiche. Non eliminarli durante la pulizia dei database di test.
@@ -11,20 +11,20 @@
 
 ## Autenticazione e proprietà dei dati
 
-- Tutte le API dell’agenda richiedono un JWT verificato da Spring Security. Solo risorse statiche e gli endpoint pubblici di registrazione, login e CSRF sono anonimi.
+- Tutte le API dell’agenda richiedono un JWT verificato da Spring Security. Solo risorse statiche, login e CSRF sono anonimi. Non esiste registrazione.
 - Clienti, appuntamenti, callback e cataloghi appartengono a un solo utente tramite `ownerId`. Ricavarlo da `UserScope`, mai dai dati inviati dal client. Applicare il vincolo anche a ricerche, conteggi, aggregazioni, riferimenti, aggiornamenti e cancellazioni multiple; un ID conosciuto non concede accesso ai dati altrui.
-- Esiti e polizze sono personali. I cataloghi iniziali vengono creati durante la registrazione e non ripristinati all’avvio.
-- Conservare JWT in cookie HttpOnly e proteggere le modifiche con CSRF, senza localStorage o chiavi di firma nel codice. Non registrare password, hash o token nei log. Non creare account o password predefiniti per l’utente.
+- Esiti e polizze sono personali. L’identità interna è `locale`; i cataloghi e l’eventuale seed privato vengono inseriti una sola volta. Non reinserire valori cancellati al riavvio.
+- Conservare JWT in cookie HttpOnly e proteggere le modifiche con CSRF, senza localStorage o chiavi di firma nel codice. Non registrare password, hash o token nei log. Per scelta esplicita dell’utente questa edizione ha una password fissa: incorporare soltanto l’hash PBKDF2 nella build privata, mai password o hash nel repository pubblico. Nessun cambio o recupero dall’interfaccia.
 - Nei test usare account fittizi soltanto nei database isolati; rimuovere anche le chiavi temporanee. Verificare isolamento con almeno due utenti, accesso anonimo negato, ID e riferimenti altrui rifiutati e cancellazioni limitate al proprietario.
-- I dati dimostrativi esistenti sono riservati a `nashj760@gmail.com`, su indicazione dell’utente; vanno conservati. La sua registrazione con password scelta nell’interfaccia li rende accessibili al relativo account.
+- Conservare intatto il MongoDB originale. Per questa build privata importare solo i suoi clienti e nomi delle polizze; escludere appuntamenti, callback e storico dimostrativi. Seed, dati locali e pacchetti personalizzati restano esclusi dal repository pubblico.
 
 ## Struttura del backend
 
 - Seguire la struttura di `LSMD_Project_MonGoFundMe`: `controllers`, `DTO` per area, `entity`, `mapper`, `service/interfaces`, implementazioni `*ServiceImpl` in `service`, `repository`, `exception`, `config` e `security`.
-- Iniettare le interfacce dei servizi nei controller. Restituire DTO espliciti, mantenendo i contratti HTTP e JSON esistenti; non esporre direttamente i documenti MongoDB.
-- I servizi gestiscono regole e transazioni; i repository gestiscono query e accessi al database. Riservare `MongoTemplate` e BSON ai repository e alla configurazione di persistenza. I mapper effettuano conversioni senza query.
+- Iniettare le interfacce dei servizi nei controller. Restituire DTO espliciti, mantenendo i contratti HTTP e JSON esistenti; non esporre direttamente le entità persistite.
+- I servizi gestiscono regole e transazioni; i repository gestiscono query e accessi al database. Riservare JDBC e SQL ai repository e alla configurazione di persistenza. Serializzare scritture e snapshot con `SqlOperationLock` nella transazione. I mapper effettuano conversioni senza query.
 - Ricavare `ownerId` da `UserScope` e usare metodi dei repository vincolati al proprietario, anche nei frammenti personalizzati. Evitare letture e cancellazioni generiche sulle entità applicative.
-- Conservare gli alias MongoDB delle entità e il formato persistito quando si cambiano nomi o package Java. Verificare la compatibilità delle API e dei documenti esistenti.
+- Versionare lo schema H2 e il formato JSON dei backup. Verificare i contratti API, i vincoli relazionali e il ripristino transazionale; non eseguire SQL dai file caricati. Nessun server H2 TCP o console.
 
 ## Stile dell’interfaccia
 

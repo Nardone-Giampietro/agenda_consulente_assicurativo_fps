@@ -31,6 +31,7 @@ export async function api(path, options = {}) {
   const method = options.method || "GET";
   const token = ["GET", "HEAD", "OPTIONS"].includes(method) ? null : await csrfToken(signal);
   if (version !== generation) throw new DOMException("Sessione cambiata", "AbortError");
+  const multipart = options.body instanceof FormData;
   const response = await fetch(`/api/${path}`, {
     ...options,
     method,
@@ -38,13 +39,13 @@ export async function api(path, options = {}) {
     signal,
     headers: {
       Accept: "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.body && !multipart ? { "Content-Type": "application/json" } : {}),
       ...(token ? { [token.headerName]: token.token } : {}),
       ...options.headers,
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: multipart ? options.body : options.body ? JSON.stringify(options.body) : undefined,
   });
-  const data = response.status === 204 ? null : await response.json().catch(() => ({}));
+  const data = response.status === 204 ? null : options.responseType === "blob" && response.ok ? await response.blob() : await response.json().catch(() => ({}));
   if (version !== generation) throw new DOMException("Sessione cambiata", "AbortError");
   if (!response.ok) {
     if (response.status === 401 && !path.startsWith("auth/"))

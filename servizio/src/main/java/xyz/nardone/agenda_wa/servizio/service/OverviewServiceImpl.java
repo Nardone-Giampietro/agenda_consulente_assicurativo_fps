@@ -19,6 +19,9 @@ import xyz.nardone.agenda_wa.servizio.service.interfaces.CatalogService;
 import xyz.nardone.agenda_wa.servizio.service.interfaces.OverviewService;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(
+    readOnly = true,
+    isolation = org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
 public class OverviewServiceImpl implements OverviewService {
   private final AppointmentRepository appointments;
   private final CallbackRepository callbacks;
