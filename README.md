@@ -154,7 +154,7 @@ Il nome del database deve iniziare con `agenda_wa_test_`: i test rifiutano nomi 
 
 L’interfaccia è stata verificata nel browser su un database di prova separato, con creazione e modifica di clienti/appuntamenti/callback, filtri, cataloghi, conferme e disposizione compatta. I dati usati nelle verifiche automatiche vengono rimossi al termine.
 
-La consultazione degli appuntamenti è stata verificata da panoramica ed elenco, con dettagli in sola lettura, passaggio alla modifica, annullamento senza salvataggio e salvataggio persistente con ritorno ai dettagli aggiornati. Sono stati controllati accesso da tastiera e disposizione delle finestre da 320 a 1440 px. Al termine delle verifiche arrestare i servizi applicativi avviati o usati e controllare che le loro porte siano libere; MongoDB può restare attivo, secondo la regola permanente in [AGENTS.md](AGENTS.md).
+La consultazione degli appuntamenti è stata verificata da panoramica ed elenco, con dettagli in sola lettura, passaggio alla modifica, annullamento senza salvataggio e salvataggio persistente con ritorno ai dettagli aggiornati. Sono stati controllati accesso da tastiera e disposizione delle finestre da 320 a 1440 px. Al termine delle verifiche arrestare i servizi applicativi avviati o usati e controllare che le loro porte siano libere; MongoDB può restare attivo, secondo le regole di verifica del progetto.
 
 Il modulo **Nuovo appuntamento** mantiene i campi entro il dialogo anche con nomi di clienti, esiti e polizze lunghi: due colonne sopra 780 px, una colonna fino a 780 px, scorrimento verticale nelle finestre basse. Le verifiche coprono undici dimensioni da 320 a 1920 px, Callback attivo/disattivo, modifica, moduli condivisi di clienti e cataloghi, campi obbligatori, errori di salvataggio e tastiera. Creazione con e senza Callback, modifica e persistenza dopo il ricaricamento sono state provate anche con il backend reale e un database isolato. Riferimenti: [desktop](docs/web/nuovo-appuntamento.jpg), [mobile](docs/web/nuovo-appuntamento-mobile.jpg) e [Callback mobile con scorrimento](docs/web/nuovo-appuntamento-callback-mobile.jpg).
 
@@ -183,7 +183,7 @@ Due riferimenti visivi dei callback contengono anagrafiche reali e sono conserva
 
 ### Pulizia dopo le modifiche al database
 
-Al termine di ogni task sul database, rimuovere i database e le collezioni di test creati durante le verifiche, comprese quelle nel browser, e le collezioni dell’agenda confermate obsolete. Se un processo di test viene interrotto prima della pulizia automatica, completare la pulizia manualmente. Conservare i dati applicativi attivi e i database di sistema MongoDB. La regola permanente per il lavoro sul progetto è in [AGENTS.md](AGENTS.md).
+Al termine di ogni task sul database, rimuovere i database e le collezioni di test creati durante le verifiche, comprese quelle nel browser, e le collezioni dell’agenda confermate obsolete. Se un processo di test viene interrotto prima della pulizia automatica, completare la pulizia manualmente. Conservare i dati applicativi attivi e i database di sistema MongoDB.
 
 Le collezioni necessarie in `agenda_wa` sono `utenti`, `clienti`, `appuntamenti`, `callback`, `cataloghi` e `metadati`. I documenti dell’agenda hanno `ownerId`, assegnato dal server. I marcatori personali in `metadati` preservano i cataloghi; la prenotazione dell’email proprietaria dei dati dimostrativi viene rimossa dopo la sua registrazione. Non vengono eseguite migrazioni o cancellazioni automatiche all’avvio.
 
@@ -191,26 +191,22 @@ Le collezioni necessarie in `agenda_wa` sono `utenti`, `clienti`, `appuntamenti`
 
 La grafica segue `AXA_Guida_Visiva.png`: blu `#00008F`, superfici chiare, accenti lilla e menta, icone semplici e pulsanti arrotondati. [AXA Italia](https://www.axa.it/) usa Source Sans Pro e Publico: Source Sans Pro è incluso localmente con la sua licenza OFL; per i titoli si usa Publico se installato, altrimenti Georgia. Il font proprietario Publico non è distribuito nel progetto.
 
-Le regole dello stile corrente sono nella skill locale [agenda-wa-ui](.agents/skills/agenda-wa-ui/SKILL.md). [AGENTS.md](AGENTS.md) ne richiede l’uso per le aggiunte e le modifiche grafiche, con aggiornamento della skill nello stesso task dopo la verifica dell’interfaccia. La guida deve descrivere lo stile risultante, così gli interventi successivi restano coerenti.
+I riferimenti grafici dell’applicazione sono in `docs/web/`. Le istruzioni locali per Codex sono escluse dal versionamento.
 
 Accesso e registrazione sono in `servizio/src/main/resources/static/index.html` e `js/auth.js`; il client API autenticato è in `js/api.js`. I riferimenti visivi aggiornati sono in [docs/web/accesso.jpg](docs/web/accesso.jpg) e [docs/web/registrazione-mobile.jpg](docs/web/registrazione-mobile.jpg).
 
 Il frontend è HTML/CSS/JavaScript a moduli, senza una catena di compilazione o dipendenze da CDN. Il backend segue la struttura di `LSMD_Project_MonGoFundMe`: `controllers`, DTO separati per area in `DTO`, documenti in `entity`, `mapper`, contratti in `service/interfaces`, implementazioni `*ServiceImpl` in `service`, `repository`, `exception`, `config` e `security`. I servizi coordinano regole e transazioni; i repository contengono gli accessi MongoDB. La ristrutturazione conserva API, dati persistiti e frontend. Dettagli delle API e del modello documentale in [docs/ARCHITETTURA.md](docs/ARCHITETTURA.md). Le immagini in `docs/images` conservano le schermate della precedente versione desktop come riferimento storico; la documentazione JavaFX generata è stata rimossa.
 
-## Versioni e branch
+## Due branch
 
-`main` e `codex/versione-online` conservano la versione web con MongoDB precedente all’edizione locale. Il tag `versione-online-2026-10-13` identifica il punto di partenza. Lo sviluppo dell’edizione per un solo computer avviene in `codex/versione-locale`.
-
-Per riprendere la versione web:
-
-```sh
-git switch main
-```
-
-Per tornare allo sviluppo locale:
+- **`online`**: questa versione web, con MongoDB e account personali. È il branch predefinito.
+- **`locale`**: versione offline per un solo computer, con H2, password fissa e pacchetti Debian.
 
 ```sh
-git switch codex/versione-locale
+git switch online
+git switch locale
 ```
 
-Il checkout cambia il codice, non i dati applicativi: database e segreti devono restare separati per le due edizioni. L’originale completo precedente alla pubblicazione è conservato nel branch locale `codex/archivio-originale`; contiene materiale personale e non viene pubblicato. Le scelte per l’edizione locale sono documentate in [docs/DISTRIBUZIONE-LOCALE.md](docs/DISTRIBUZIONE-LOCALE.md).
+Entrambi usano la stessa cartella del progetto. Il checkout cambia il codice, senza migrare i database. `.local` conserva database, cache e strumenti temporanei; non è una seconda copia del progetto.
+
+Sorgenti, portafoglio Excel e immagini sono condivisi. Nel branch `locale` sono disponibili anche il seed iniziale, l’hash PBKDF2 e i pacchetti `.deb` in `dist/`. Le istruzioni Markdown per Codex restano locali.

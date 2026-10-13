@@ -5,9 +5,7 @@
 *.log
 node_modules/
 
-# Portafogli, esportazioni e riferimenti con anagrafiche reali
-*.xlsx
-*.xls
-*.ejson
-/docs/web/callback.jpg
-/docs/web/callback-mobile.jpg
+# Istruzioni locali per Codex
+/AGENTS.md
+/CONTEXT.md
+/.agents/
