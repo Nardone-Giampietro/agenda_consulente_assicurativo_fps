@@ -1,0 +1,13 @@
+.DS_Store
+**/target/
+**/.idea/
+.local/
+*.log
+node_modules/
+
+# Portafogli, esportazioni e riferimenti con anagrafiche reali
+*.xlsx
+*.xls
+*.ejson
+/docs/web/callback.jpg
+/docs/web/callback-mobile.jpg
