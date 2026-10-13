@@ -1,4 +1,0 @@
-interface:
-  display_name: "Stile Agenda WA"
-  short_description: "Mantieni e aggiorna lo stile grafico di Agenda WA"
-  default_prompt: "Usa $agenda-wa-ui per modificare l’interfaccia di Agenda WA in modo coerente e aggiornare la guida al nuovo stile."
