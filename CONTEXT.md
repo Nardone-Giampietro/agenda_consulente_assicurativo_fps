@@ -28,7 +28,10 @@ Identità con cui un cliente è riconosciuto nell’agenda: nome e cognome per u
 Denominazione completa di una persona o di un’azienda presente nel portafoglio assicurativo. Nell’estrazione dei clienti, le sue occorrenze ripetute identificano una sola anagrafica, ignorando differenze di maiuscole e spazi senza accorpare denominazioni diverse.
 
 **Utente**:
-Persona titolare di un account e della propria agenda, distinta dai clienti cui si riferiscono le attività.
+Persona titolare della propria agenda, distinta dai clienti cui si riferiscono le attività. Nell’edizione locale è l’unico utilizzatore dell’agenda.
+
+**Agenda personale**:
+Insieme dei clienti e delle attività di un utente, con i relativi esiti e polizze.
 
 **Appuntamento**:
 Attività del consulente riferita a un cliente, con data ed esito.
