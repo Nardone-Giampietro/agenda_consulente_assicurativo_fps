@@ -17,11 +17,6 @@
   </dependencies>
   <build><finalName>agenda-wa</finalName><plugins>
     <plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin>
-    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><executions><execution>
-      <id>private-package-configuration</id><phase>process-resources</phase><goals><goal>copy-resources</goal></goals>
-      <configuration><outputDirectory>${project.build.outputDirectory}</outputDirectory><resources><resource>
-        <directory>${project.basedir}/../.local/distribuzione</directory><includes><include>local-password.properties</include><include>initial-data.json</include></includes>
-      </resource></resources></configuration>
-    </execution></executions></plugin>
+
   </plugins></build>
 </project>

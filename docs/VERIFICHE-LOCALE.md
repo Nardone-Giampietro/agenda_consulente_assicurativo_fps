@@ -16,15 +16,15 @@ I pacchetti includono Temurin 21.0.12.1+1; il backend usa H2 2.4.240. La prova D
 
 I test backend verificano accesso anonimo negato, CSRF, cookie, logout, riferimenti e cancellazioni vincolati al proprietario, concorrenza DELETE/PUT, ricerche con accenti e parole intere, totali, storico derivato, priorità callback, vincoli relazionali e ripristino transazionale. Le regressioni sulla normalizzazione Unicode e sui backup oltre 20 MB sono coperte; un backup con 4.200 appuntamenti viene esportato, salvato automaticamente e ripristinato.
 
-Le schermate locali in `docs/web/accesso-locale*.jpg` e `backup-*.jpg` sono state ispezionate su desktop e mobile e usano dati fittizi. La guida [agenda-wa-ui](../.agents/skills/agenda-wa-ui/SKILL.md) è aggiornata ai controlli effettivi.
+Le schermate locali in `docs/web/accesso-locale*.jpg` e `backup-*.jpg` sono state ispezionate su desktop e mobile e usano dati fittizi. La guida locale per Codex è aggiornata ai controlli effettivi ed è esclusa dal versionamento.
 
 ## Dati e pulizia
 
-Il database H2 applicativo privato contiene 280 clienti, 22 polizze, 0 appuntamenti e 0 callback. Ogni campo importato di clienti e polizze corrisponde al seed privato; i sei esiti iniziali vengono creati dall’edizione locale. Il confronto di conteggi e impronte SHA-256 conferma che tutte e sei le collezioni del MongoDB originale sono identiche prima e dopo il lavoro. Nessuna collezione di quella versione è stata eliminata.
+Il database H2 applicativo privato contiene 280 clienti, 22 polizze, 0 appuntamenti e 0 callback. Ogni campo importato di clienti e polizze corrisponde al seed iniziale; i sei esiti iniziali vengono creati dall’edizione locale. Il confronto di conteggi e impronte SHA-256 conferma che tutte e sei le collezioni del MongoDB originale sono identiche prima e dopo il lavoro. Nessuna collezione di quella versione è stata eliminata.
 
 Le cartelle H2 temporanee dei test, le relative chiavi e i container Debian sono eliminati. I processi applicativi di verifica vengono identificati e arrestati; le porte 8080 e 18080 risultano libere sul computer dello sviluppatore, e la porta interna 18080 è verificata libera prima di rimuovere ogni container. MongoDB originale può restare attivo sulla porta 27018. Non restano database Mongo con prefisso `agenda_wa_test_`.
 
-Password fornita, hash privato, seed, portafoglio, database e pacchetti personalizzati restano esclusi da Git. Le somme SHA-256 dei `.deb` sono nella cartella privata di consegna.
+Su richiesta successiva dell’utente, seed, hash PBKDF2, portafoglio, immagini e `.deb` sono condivisi nel repository. Password in chiaro, chiavi JWT, database di lavoro, cache e istruzioni Codex restano esclusi. Le somme SHA-256 dei `.deb` sono in `dist/SHA256SUMS`.
 
 ## Limite della verifica
 

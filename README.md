@@ -8,7 +8,7 @@ Il primo ambiente previsto è Linux su Chromebook già abilitato, con le normali
 
 Avviare **Agenda WA** dal menu delle applicazioni Linux; il processo apre il browser su `http://localhost:8080`. Un secondo avvio riapre il browser senza avviare un’altra istanza. Il server ascolta esclusivamente su `127.0.0.1`. La porta può essere scelta con `PORT`; se occupata da un altro programma l’avvio termina e registra l’errore.
 
-L’accesso richiede la sola password fissa concordata, senza registrazione, cambio o recupero. Nella build è incluso soltanto il suo hash PBKDF2 con sale; la password e l’hash privato restano fuori da Git. JWT in cookie HttpOnly/SameSite=Strict, CSRF e revoca al logout proteggono tutte le API. Non esistono server H2 TCP o console web del database.
+L’accesso richiede la sola password fissa concordata, senza registrazione, cambio o recupero. Nella build è incluso soltanto il suo hash PBKDF2 con sale; l’hash è incluso nelle risorse del progetto, mentre la password non viene salvata in chiaro. JWT in cookie HttpOnly/SameSite=Strict, CSRF e revoca al logout proteggono tutte le API. Non esistono server H2 TCP o console web del database.
 
 I dati risiedono in `~/.local/share/agenda-wa/`, indipendentemente dalla cartella di avvio:
 
@@ -30,11 +30,11 @@ Le copie automatiche iniziano dopo un minuto e vengono controllate ogni 15 minut
 
 Prima di aggiornare esportare un backup, arrestare l’applicazione e installare il nuovo `.deb`. I dati nella home restano disponibili dopo aggiornamento o reinstallazione; la disinstallazione non li elimina. Lo schema è versionato: una versione non supportata blocca l’avvio senza conversioni implicite. Un futuro cambio del motore H2 richiede esportazione/importazione e verifica dedicata. Non copiare il file fisico del database tra versioni incompatibili.
 
-## Dati iniziali della build privata
+## Dati iniziali della build
 
 Su richiesta dell’utente questa consegna contiene **280 clienti e 22 nomi di polizze** dell’agenda esistente, più i sei esiti iniziali. Non contiene appuntamenti, callback, storico, account, password o token provenienti da MongoDB. Il MongoDB originale resta intatto. L’inserimento iniziale avviene una sola volta; clienti e cataloghi cancellati non vengono ripristinati al riavvio.
 
-Seed, hash, JAR e `.deb` personalizzati sono nella cartella privata `.local`, esclusa dal repository pubblico. Questi pacchetti contengono le anagrafiche richieste e devono essere consegnati solo al destinatario di quei dati. Per una distribuzione ad altri clienti compilare senza il seed privato e con l’hash concordato per quella build; vengono creati soltanto i cataloghi iniziali.
+Il seed iniziale e l’hash PBKDF2 sono in `servizio/src/main/resources/`; i pacchetti `.deb` e le loro somme SHA-256 sono in [dist](dist/). Sono condivisi insieme ai sorgenti, al portafoglio Excel e alle immagini del progetto, su richiesta dell’utente. Le istruzioni locali per Codex non sono tracciate.
 
 ## Compilazione del backend
 
@@ -46,23 +46,9 @@ AGENDA_OPEN_BROWSER=false AGENDA_DATA_DIR="$PWD/.local/agenda-wa-locale" \
   java -jar servizio/target/agenda-wa.jar
 ```
 
-Prima di compilare preparare `.local/distribuzione/local-password.properties`, leggibile solo dallo sviluppatore, con `agenda.auth.fixed-password-hash=` seguito dall’hash esadecimale PBKDF2-HMAC-SHA256: sale casuale di 16 byte, 600.000 iterazioni, digest di 32 byte, formato sale seguito dal digest. L’assenza di un hash valido impedisce l’avvio; non c’è una password di fallback. Per generarlo senza scrivere la password in un comando o file:
+Il repository include già `local-password.properties` e `initial-data.json` nelle risorse: il clone può essere compilato direttamente. Il primo file contiene solo l’hash PBKDF2-HMAC-SHA256 concordato (sale 16 byte, 600.000 iterazioni, digest 32 byte); il secondo contiene clienti e polizze iniziali. Nessuna configurazione deve essere copiata dalla cartella `.local` per compilare.
 
-```sh
-mkdir -p .local/distribuzione
-chmod 700 .local/distribuzione
-python3 - <<'PY_HASH'
-import getpass, hashlib, secrets
-from pathlib import Path
-salt = secrets.token_bytes(16)
-digest = hashlib.pbkdf2_hmac('sha256', getpass.getpass('Password della build: ').encode(), salt, 600000)
-file = Path('.local/distribuzione/local-password.properties')
-file.write_text('agenda.auth.fixed-password-hash=' + (salt + digest).hex() + '\n')
-file.chmod(0o600)
-PY_HASH
-```
-
-Facoltativamente `.local/distribuzione/initial-data.json` contiene soltanto `clienti` e `cataloghi` di tipo `polizze`, nel formato del [backup](servizio/src/main/java/xyz/nardone/agenda_wa/servizio/DTO/backup/BackupDataDTO.java). Non includere `ownerId`, storico o attività. Usare sempre `clean package` quando si cambia destinatario, per rimuovere risorse private di una build precedente.
+`.local` conserva soltanto i database usati durante lo sviluppo, cache e strumenti di costruzione temporanei. Non contiene una seconda copia del progetto. Il programma installato salva i propri dati in `~/.local/share/agenda-wa`, secondo la convenzione Linux.
 
 ## Costruzione dei pacchetti Debian
 
@@ -71,8 +57,7 @@ Docker serve soltanto sul computer dello sviluppatore. [packaging/Dockerfile](pa
 Preparare un contesto contenente solo JAR e icona, senza il resto del progetto:
 
 ```sh
-mkdir -p .local/package-input .local/release
-chmod 700 .local/package-input .local/release
+mkdir -p .local/package-input dist
 cp servizio/target/agenda-wa.jar .local/package-input/agenda-wa.jar
 cp packaging/agenda-wa.png .local/package-input/agenda-wa.png
 ```
@@ -100,9 +85,8 @@ docker build --platform "linux/$ARCH" -f packaging/Dockerfile \
   --build-arg "JDK_URL=$JDK_URL" --build-arg "JDK_SHA256=$JDK_SHA256" \
   -t "agenda-wa-local-build:$ARCH" .local/package-input
 docker create --platform "linux/$ARCH" --name agenda-wa-package "agenda-wa-local-build:$ARCH"
-docker cp "agenda-wa-package:/out/agenda-wa_1.0.0_$ARCH.deb" .local/release/
+docker cp "agenda-wa-package:/out/agenda-wa_1.0.0_$ARCH.deb" dist/
 docker rm agenda-wa-package
-chmod 600 .local/release/*.deb
 ```
 
 Il `.deb` dipende dalle normali librerie Linux elencate da `dpkg-deb --field FILE.deb Depends`, fra cui `xdg-utils`, libc e X11; non dipende da un pacchetto Java. Sono predisposte nell’immagine di verifica prima di togliere la rete. La compilazione e le immagini di verifica non fanno parte della consegna al cliente.
@@ -121,8 +105,18 @@ NODE_PATH="$PWD/.local/browser-check/node_modules" \
 
 La [prova del pacchetto](servizio/src/test/package/local-package.test.py) deve essere eseguita esclusivamente nel container isolato creato da [Verification.Dockerfile](packaging/Verification.Dockerfile), con `--network none`, dati sotto `/home/agenda/agenda_wa_test_package` e credenziali via stdin. Verifica importazione, CRUD, backup/ripristino, revoca e persistenza al riavvio; il chiamante arresta e rimuove il container al termine. Non usare questi test sull’agenda attiva.
 
-## Branch e documentazione
+## Due branch
 
-La versione web precedente è conservata su GitHub in `main` e `codex/versione-online`, al tag `versione-online-2026-10-13` (commit `8a87e2c`). Questa edizione è sviluppata in `codex/versione-locale`. Per riprendere lo sviluppo online usare `git switch codex/versione-online`; per tornare alla locale `git switch codex/versione-locale`, dopo aver salvato le modifiche. Il checkout non converte i database: mantenere distinte le cartelle delle due edizioni.
+- **`online`**: versione web precedente, con MongoDB e account personali.
+- **`locale`**: versione offline, con H2 e pacchetti Debian.
 
-L’originale con materiale personale resta solo nel branch locale `codex/archivio-originale`. Portafogli, database, chiavi e schermate con anagrafiche reali non sono pubblicati. Consultare [risultati delle verifiche](docs/VERIFICHE-LOCALE.md), [architettura](docs/ARCHITETTURA.md), [decisioni della distribuzione](docs/DISTRIBUZIONE-LOCALE.md), [glossario](CONTEXT.md) e [guida UI](.agents/skills/agenda-wa-ui/SKILL.md).
+Per cambiare versione:
+
+```sh
+git switch online
+git switch locale
+```
+
+I due branch usano la stessa cartella del progetto. Il checkout cambia il codice; conserva separatamente i database delle due edizioni. `online` è il branch predefinito su GitHub.
+
+Consultare [architettura](docs/ARCHITETTURA.md), [distribuzione](docs/DISTRIBUZIONE-LOCALE.md) e [verifiche](docs/VERIFICHE-LOCALE.md).

@@ -33,9 +33,9 @@ La ricerca clienti usa frammenti normalizzati. Quella appuntamenti richiede tutt
 
 Il launcher nativo incluso dal `.deb` avvia il JAR Spring Boot con Java incluso. [LocalLaunchGuard](../servizio/src/main/java/xyz/nardone/agenda_wa/servizio/config/LocalLaunchGuard.java) usa un lock del sistema operativo per la cartella dati; una seconda invocazione apre soltanto il browser. [BrowserLaunch](../servizio/src/main/java/xyz/nardone/agenda_wa/servizio/config/BrowserLaunch.java) usa l’apertura URL di sistema dopo l’avvio HTTP.
 
-`FixedPassword` verifica l’hash privato PBKDF2-HMAC-SHA256 (sale 16 byte, 600.000 iterazioni, digest 32 byte). La build senza hash valido non parte. Nessuna password, hash o chiave viene registrata nei log o inclusa nel codice pubblico. JWT HS256 durano due ore, cookie HttpOnly/SameSite=Strict e percorso `/api`; le modifiche richiedono CSRF. Logout e ripristino incrementano la versione dei token e revocano le sessioni. Login è limitato dopo dieci tentativi errati per 15 minuti.
+`FixedPassword` verifica l’hash PBKDF2 PBKDF2-HMAC-SHA256 (sale 16 byte, 600.000 iterazioni, digest 32 byte). La build senza hash valido non parte. Password, hash e chiavi non vengono registrati nei log. Su richiesta dell’utente l’hash fisso è incluso nelle risorse versionate; la password in chiaro e le chiavi JWT non sono pubblicate. JWT HS256 durano due ore, cookie HttpOnly/SameSite=Strict e percorso `/api`; le modifiche richiedono CSRF. Logout e ripristino incrementano la versione dei token e revocano le sessioni. Login è limitato dopo dieci tentativi errati per 15 minuti.
 
-`LocalBootstrap` richiama il servizio transazionale di inizializzazione prima dell’avvio HTTP. L’identità locale e il seed privato vengono creati una sola volta; un metadato persistente impedisce il reinserimento dei cataloghi cancellati. Il seed accetta soltanto clienti e polizze, senza attività o credenziali originali.
+`LocalBootstrap` richiama il servizio transazionale di inizializzazione prima dell’avvio HTTP. L’identità locale e il seed iniziale vengono creati una sola volta; un metadato persistente impedisce il reinserimento dei cataloghi cancellati. Il seed accetta soltanto clienti e polizze, senza attività o credenziali originali.
 
 ## Backup
 

@@ -1,0 +1,13 @@
+{
+  "versione": "1.0.0",
+  "branch": "locale",
+  "java": "Temurin 21.0.12.1+1",
+  "h2": "2.4.240",
+  "database": "280 clienti, 22 polizze, 0 appuntamenti, 0 callback",
+  "pacchetti": [
+    "agenda-wa_1.0.0_amd64.deb",
+    "agenda-wa_1.0.0_arm64.deb"
+  ],
+  "test": "14 backend; 38 UI esistente; 4 UI locale; installazione senza rete, riavvio, ripristino e reinstallazione amd64/arm64",
+  "limite_verifica": "Nessun Chromebook fisico disponibile; verifiche Debian 12 in container"
+}
